@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="8dp">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/dialog_list_item_avatar_card_view"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="16dp"
+        app:cardCornerRadius="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/dialog_list_item_avatar_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop"
+            android:src="@drawable/kotkot" />
+
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/dialog_list_item_name_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:text="Кот Степан"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/dialog_list_item_last_message_text_view"
+        app:layout_constraintEnd_toStartOf="@+id/dialog_list_item_new_messages_count_text_view"
+        app:layout_constraintStart_toEndOf="@+id/dialog_list_item_avatar_card_view"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/dialog_list_item_last_message_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textSize="14sp"
+        android:text="Будьте добры, принесите попить, пожалуйста"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/dialog_list_item_name_text_view"
+        app:layout_constraintStart_toStartOf="@+id/dialog_list_item_name_text_view"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_list_item_name_text_view" />
+
+
+    <TextView
+        android:id="@+id/dialog_list_item_new_messages_count_text_view"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="@drawable/circle"
+        android:text="99"
+        android:textSize="14sp"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
