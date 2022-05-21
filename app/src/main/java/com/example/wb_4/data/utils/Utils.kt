@@ -1,10 +1,6 @@
-package com.example.wb_4.data
+package com.example.wb_4.data.utils
 
-import android.os.Message
-import com.cesarferreira.tempo.Tempo
-import com.cesarferreira.tempo.hour
-import com.cesarferreira.tempo.minus
-import com.cesarferreira.tempo.minute
+import com.cesarferreira.tempo.*
 import com.example.wb_4.data.storage.ChatConstants.AVATARS_SRC_LIST
 import com.example.wb_4.data.storage.ChatConstants.FIRST_NAMES_LIST
 import com.example.wb_4.data.storage.ChatConstants.MESSAGE_STRING_LIST
@@ -19,48 +15,58 @@ import com.example.wb_4.domain.model.CompanionUserDomain
 import com.example.wb_4.domain.model.MessageDomain
 
 
+//Функция создания нового случайного диалога со случайным набором сообщений
 fun createRandomCompanionUserData(): CompanionUserData {
 
+    //Новый список сообщений
     val newMessages = mutableListOf<MessageData>()
 
+    //Рандомное число непрочитанных сообщений
     val unreadMessagesCountRandom = (0..12).random()
+    //Рандомное количество сообщений
     val messagesCount = (12..42).random()
+    //переменная для указания на автороство последнего сообщения - сам пользователь или собеседник
     val lastMessageSender = (NOT_YOUR_MESSAGE..YOUR_MESSAGE).random()
 
-    for (i in 0..messagesCount){
+    //Добавление новых рандомных сообщений в список сообщений
+    for (i in 0..messagesCount) {
         newMessages.add(
             MessageData(
-            id = i,
-            message = MESSAGE_STRING_LIST[(MESSAGE_STRING_LIST.indices).random()],
-            isRead = i < messagesCount - unreadMessagesCountRandom,
-            isYour = if (i < messagesCount - unreadMessagesCountRandom)
-                (NOT_YOUR_MESSAGE..YOUR_MESSAGE).random() == YOUR_MESSAGE else
+                id = i,
+                message = MESSAGE_STRING_LIST[(MESSAGE_STRING_LIST.indices).random()],
+                isRead = i < messagesCount - unreadMessagesCountRandom,
+                isYour = if (i < messagesCount - unreadMessagesCountRandom)
+                    (NOT_YOUR_MESSAGE..YOUR_MESSAGE).random() == YOUR_MESSAGE else
                     lastMessageSender == YOUR_MESSAGE
-        )
+            )
         )
     }
 
-        CompanionUserDB.messageLists.add(
-            MessageList(
-                id = if(CompanionUserDB.messageLists.isNotEmpty())
-                    CompanionUserDB.dialogsList[CompanionUserDB.dialogsList.size - 1].id + 1 else 0,
-                messages = newMessages
-            )
+    //Добавления списка сообщений в общий список сообщений для каждого диалога
+    CompanionUserDB.messageLists.add(
+        MessageList(
+            id = if (CompanionUserDB.messageLists.isNotEmpty())
+                CompanionUserDB.dialogsList[CompanionUserDB.dialogsList.size - 1].id + 1 else 0,
+            messages = newMessages
         )
+    )
 
 
-
+    //Возврат нового рандомного диалога со случайными данными
     return CompanionUserData(
-        id = if(CompanionUserDB.dialogsList.isNotEmpty())
+        id = if (CompanionUserDB.dialogsList.isNotEmpty())
             CompanionUserDB.dialogsList[CompanionUserDB.dialogsList.size - 1].id + 1 else 0,
         name = "${FIRST_NAMES_LIST[(FIRST_NAMES_LIST.indices).random()]} " +
                 SECOND_NAMES_LIST[(SECOND_NAMES_LIST.indices).random()],
         avatar = AVATARS_SRC_LIST[(AVATARS_SRC_LIST.indices).random()],
         lastMessage = newMessages[newMessages.size - 1],
         lastMessageTime = Tempo.now - (0..8).random().hour - (0..59).random().minute,
-        receivedUnreadMessagesCount = unreadMessagesCountRandom)
+        receivedUnreadMessagesCount = if (lastMessageSender == YOUR_MESSAGE) 0 else
+            unreadMessagesCountRandom
+    )
 }
 
+//Маппер CompanionUserData в CompanionUserDomain
 fun CompanionUserData.toDomain(): CompanionUserDomain {
     return CompanionUserDomain(
         id = id,
@@ -72,11 +78,34 @@ fun CompanionUserData.toDomain(): CompanionUserDomain {
     )
 }
 
-fun MessageData.toDomain(): MessageDomain{
+//Маппер MessageData в MessageDomain
+fun MessageData.toDomain(): MessageDomain {
     return MessageDomain(
         id = id,
         message = message,
         isRead = isRead,
         isYour = isYour
     )
+}
+
+//Создание случайных изменений в списке диалогов
+fun createRandomChanges() {
+
+    //выбор одного или двух случайных диалогов, от которых придет новое сообщение
+    for (i in 0..(0..1).random()) {
+        val id = (CompanionUserDB.dialogsList.indices).random()
+        val newMessage = MessageData(
+            id = CompanionUserDB.messageLists[id].messages.size,
+            message = MESSAGE_STRING_LIST[(MESSAGE_STRING_LIST.indices).random()],
+            isRead = false,
+            isYour = false
+        )
+        CompanionUserDB.messageLists[id].messages.add(newMessage)
+
+        CompanionUserDB.dialogsList[id].lastMessage = newMessage
+        CompanionUserDB.dialogsList[id].lastMessageTime = Tempo.now
+        CompanionUserDB.dialogsList[id].receivedUnreadMessagesCount =
+            CompanionUserDB.dialogsList[id].receivedUnreadMessagesCount?.plus(1)
+    }
+
 }

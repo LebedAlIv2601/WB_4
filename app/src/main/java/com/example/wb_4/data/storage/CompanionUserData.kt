@@ -7,7 +7,7 @@ data class CompanionUserData(
     val id: Int,
     val name: String,
     val avatar: String?,
-    val lastMessage: MessageData?,
-    val lastMessageTime: Date?,
-    val receivedUnreadMessagesCount: Int?
+    var lastMessage: MessageData?,
+    var lastMessageTime: Date?,
+    var receivedUnreadMessagesCount: Int?
 )

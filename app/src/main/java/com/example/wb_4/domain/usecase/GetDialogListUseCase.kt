@@ -6,8 +6,8 @@ import javax.inject.Inject
 
 class GetDialogListUseCase @Inject constructor(private val repository: DialogRepository) {
 
-    suspend fun execute(): List<CompanionUserDomain>{
-        return repository.getDialogs()
+    suspend fun execute(lastId: Int): List<CompanionUserDomain>{
+        return repository.getDialogs(lastId)
     }
 
 }

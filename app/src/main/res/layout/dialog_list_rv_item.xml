@@ -49,29 +49,59 @@
         android:layout_marginTop="4dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textSize="14sp"
         android:text="Будьте добры, принесите попить, пожалуйста"
+        android:textColor="@color/black"
+        android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/dialog_list_item_name_text_view"
-        app:layout_constraintStart_toStartOf="@+id/dialog_list_item_name_text_view"
+        app:layout_constraintStart_toEndOf="@+id/your_message_last_text_view"
         app:layout_constraintTop_toBottomOf="@+id/dialog_list_item_name_text_view" />
+
+    <TextView
+        android:id="@+id/time_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="17:12"
+        app:layout_constraintBottom_toTopOf="@+id/dialog_list_item_new_messages_count_text_view"
+        app:layout_constraintEnd_toEndOf="@+id/dialog_list_item_new_messages_count_text_view"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/dialog_list_item_new_messages_count_text_view"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <TextView
         android:id="@+id/dialog_list_item_new_messages_count_text_view"
         android:layout_width="20dp"
         android:layout_height="20dp"
+        android:layout_marginEnd="16dp"
         android:background="@drawable/circle"
         android:text="99"
-        android:textSize="14sp"
         android:textAlignment="center"
         android:textColor="@color/white"
-        android:layout_marginEnd="32dp"
+        android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/time_text_view" />
 
+    <ImageView
+        android:id="@+id/unread_your_messages_marker"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:src="@drawable/circle"
+        app:layout_constraintBottom_toBottomOf="@+id/dialog_list_item_new_messages_count_text_view"
+        app:layout_constraintEnd_toEndOf="@+id/dialog_list_item_new_messages_count_text_view"
+        app:layout_constraintStart_toStartOf="@+id/dialog_list_item_new_messages_count_text_view"
+        app:layout_constraintTop_toTopOf="@+id/dialog_list_item_new_messages_count_text_view" />
 
+    <TextView
+        android:id="@+id/your_message_last_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingEnd="4dp"
+        android:text="@string/your_message_marker_text"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/dialog_list_item_last_message_text_view"
+        app:layout_constraintStart_toStartOf="@+id/dialog_list_item_name_text_view" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

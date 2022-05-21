@@ -1,4 +1,4 @@
-package com.example.wb_4
+package com.example.wb_4.presentation.utils
 
 sealed class Resource<out T>(val data: T?, val message: String?) {
 
