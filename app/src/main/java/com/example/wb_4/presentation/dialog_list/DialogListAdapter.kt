@@ -14,7 +14,7 @@ import com.example.wb_4.databinding.DialogListRvItemBinding
 import com.example.wb_4.domain.model.CompanionUserDomain
 
 
-class DialogListAdapter:
+class DialogListAdapter (private val clickFun: (CompanionUserDomain) -> Unit):
     ListAdapter<CompanionUserDomain, DialogListAdapter.DialogListViewHolder>(AsyncDifferConfig.Builder(DiffCallback()).build()) {
 
     class DialogListViewHolder(private val binding: DialogListRvItemBinding):
@@ -35,7 +35,7 @@ class DialogListAdapter:
                         unreadYourMessagesMarker.visibility = View.GONE
                         dialogListItemNewMessagesCountTextView.text =
                             item.receivedUnreadMessagesCount.toString()
-                    } else if (item.receivedUnreadMessagesCount != 0 && item.lastMessage.isYour){
+                    } else if (!item.lastMessage.isRead && item.lastMessage.isYour){
                         dialogListItemNewMessagesCountTextView.visibility = View.INVISIBLE
                         unreadYourMessagesMarker.visibility = View.VISIBLE
                     } else{
@@ -70,7 +70,16 @@ class DialogListAdapter:
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DialogListViewHolder {
-        return DialogListViewHolder.from(parent)
+
+        val viewHolder = DialogListViewHolder.from(parent)
+
+        viewHolder.itemView.setOnClickListener {
+            if(viewHolder.adapterPosition != RecyclerView.NO_POSITION){
+                getItem(viewHolder.adapterPosition)?.let(clickFun)
+            }
+        }
+
+        return viewHolder
     }
 
     override fun onBindViewHolder(holder: DialogListViewHolder, position: Int) {

@@ -7,13 +7,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.wb_4.presentation.utils.Resource
+import com.example.wb_4.R
 import com.example.wb_4.appComponent
 import com.example.wb_4.databinding.FragmentDialogListBinding
 import com.example.wb_4.domain.model.CompanionUserDomain
@@ -50,6 +50,7 @@ class DialogListFragment : Fragment() {
         super.onAttach(context)
     }
 
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -61,91 +62,58 @@ class DialogListFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+
+
         //Вызываем метод для настройки RecyclerView
         setupRecyclerView()
 
-        //Устанавливаем слушатель для метода, получающего первые 10 элементов начиная с 0 индекса
-        setupDataObserver(0)
+        setupObservers()
 
-        //Настраиваем слушателей
         setupListeners()
         super.onViewCreated(view, savedInstanceState)
     }
 
-    //Метод для установки слушателя на метод для обновления списка диалогов
-    private fun setupUpdateDataObserver() {
-        vm.updateDialogList().observe(viewLifecycleOwner, Observer {
-            it?.let { resource ->
-                when(resource){
-                    is Resource.Success -> {
-
-                        adapter?.submitList(it.data)
-
-                        //Разрешаем загрузку элементов и устанвливаем последний индекс 0
-                        loadPermission = true
-                        dataLastIndex = 0
-
-                        binding?.dialogListSwipeRefresh?.isRefreshing = false
-                    }
-
-                    is Resource.Error -> {
-                        Toast.makeText(context, "Some error", Toast.LENGTH_SHORT).show()
-                        binding?.dialogListSwipeRefresh?.isRefreshing = false
-                    }
-
-                    is Resource.Loading -> {
-                        binding?.dialogListSwipeRefresh?.isRefreshing = true
-                    }
-                }
-            }
-        })
-    }
 
     private fun setupListeners() {
         binding?.dialogListSwipeRefresh?.setOnRefreshListener {
             Log.e("Refresh", "Refresh is called")
 
-            //Вызываем метод для установки слушателя для метода обновления списка
-            setupUpdateDataObserver()
+            binding?.dialogListSwipeRefresh?.isRefreshing = true
+
+            vm.updateDialogs()
         }
     }
 
-    //Метод установки слушателя для метода получения части списка диалогов
-    private fun setupDataObserver(lastId: Int) {
-        vm.getDialogList(lastId).observe(viewLifecycleOwner, Observer {
-            it?.let { resource ->
-                when(resource){
-                    is Resource.Success -> {
-                        //Если список полученных данных не пустой, то соединяем полученные данные
-                        //со списком уже имещихся данных, иначе устанавливаем
-                        // флаг разрешения загрузки false
-                        if(it.data?.isNotEmpty() == true){
-                            val prevList = adapter?.currentList?.toMutableList()
-                            val resultList = mutableListOf<CompanionUserDomain>()
-                            prevList?.let { it1 -> resultList.addAll(it1) }
-                            resultList.addAll(it.data)
-                            adapter?.submitList(resultList)
-                        } else{
-                            loadPermission = false
-                        }
-                        binding?.dialogListSwipeRefresh?.isRefreshing = false
-                    }
-
-                    is Resource.Error -> {
-                        Toast.makeText(context, "Some error", Toast.LENGTH_SHORT).show()
-                        binding?.dialogListSwipeRefresh?.isRefreshing = false
-                    }
-
-                    is Resource.Loading -> {
-                        binding?.dialogListSwipeRefresh?.isRefreshing = true
-                    }
-                }
-            }
+    private fun setupObservers(){
+        vm.dialogsList.observe(viewLifecycleOwner, Observer {
+            adapter?.submitList(it)
+            binding?.dialogListSwipeRefresh?.isRefreshing = false
         })
+
+        vm.loadPermission.observe(viewLifecycleOwner, Observer {
+            loadPermission = it
+        })
+
+        vm.dataLastIndex.observe(viewLifecycleOwner, Observer {
+            dataLastIndex = it
+        })
+
+
+    }
+
+
+
+    private fun navigateToChat(item: CompanionUserDomain){
+        val navController = findNavController()
+        val userInfoBundle = Bundle()
+        userInfoBundle.putString("name", "${item.name}")
+        userInfoBundle.putString("avatar", "${item.avatar}")
+        navController.navigate(R.id.action_dialogListFragment_to_chatFragment, userInfoBundle)
     }
 
     private fun setupRecyclerView(){
-        adapter = DialogListAdapter()
+        adapter = DialogListAdapter{ navigateToChat(it) }
 
         binding?.apply {
             dialogListRv.adapter = adapter
@@ -159,6 +127,7 @@ class DialogListFragment : Fragment() {
 
             //Убираем itemAnimator, так как с ним приложение падает при обновлении списка
             dialogListRv.itemAnimator = null
+
 
             //Устанавлием слушателя скролла для вызова метода получения следующей порции данных
             dialogListRv.addOnScrollListener(object: RecyclerView.OnScrollListener(){
@@ -177,8 +146,8 @@ class DialogListFragment : Fragment() {
                                 dataLastIndex != layoutManager.findLastVisibleItemPosition()
                             ) {
                                 Log.e("Scroll", "Need more data detected by scroll")
-                                dataLastIndex = layoutManager.findLastVisibleItemPosition()
-                                setupDataObserver(layoutManager.findLastVisibleItemPosition())
+                                vm.setupDataLastIndex(layoutManager.findLastVisibleItemPosition())
+                                vm.getDialogs(layoutManager.findLastVisibleItemPosition())
                             }
                         }
                     }
@@ -193,5 +162,10 @@ class DialogListFragment : Fragment() {
         binding = null
         adapter = null
         super.onDestroyView()
+    }
+
+    override fun onDestroy() {
+        Log.e("onDestroy", "onDestroy")
+        super.onDestroy()
     }
 }

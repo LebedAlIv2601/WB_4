@@ -8,5 +8,14 @@
         android:id="@+id/dialogListFragment"
         android:name="com.example.wb_4.presentation.dialog_list.DialogListFragment"
         android:label="fragment_dialog_list"
-        tools:layout="@layout/fragment_dialog_list" />
+        tools:layout="@layout/fragment_dialog_list" >
+        <action
+            android:id="@+id/action_dialogListFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.example.wb_4.presentation.chat.ChatFragment"
+        android:label="fragment_chat"
+        tools:layout="@layout/fragment_chat" />
 </navigation>
