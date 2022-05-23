@@ -42,11 +42,13 @@ fun createRandomCompanionUserData(): CompanionUserData {
         )
     }
 
+    val randomId = if (CompanionUserDB.messageLists.isNotEmpty())
+        CompanionUserDB.messageLists[CompanionUserDB.messageLists.size - 1].id + 1 else 0
+
     //Добавления списка сообщений в общий список сообщений для каждого диалога
     CompanionUserDB.messageLists.add(
         MessageList(
-            id = if (CompanionUserDB.messageLists.isNotEmpty())
-                CompanionUserDB.dialogsList[CompanionUserDB.dialogsList.size - 1].id + 1 else 0,
+            id = randomId,
             messages = newMessages
         )
     )
@@ -54,15 +56,13 @@ fun createRandomCompanionUserData(): CompanionUserData {
 
     //Возврат нового рандомного диалога со случайными данными
     return CompanionUserData(
-        id = if (CompanionUserDB.dialogsList.isNotEmpty())
-            CompanionUserDB.dialogsList[CompanionUserDB.dialogsList.size - 1].id + 1 else 0,
+        id = randomId,
         name = "${FIRST_NAMES_LIST[(FIRST_NAMES_LIST.indices).random()]} " +
                 SECOND_NAMES_LIST[(SECOND_NAMES_LIST.indices).random()],
         avatar = AVATARS_SRC_LIST[(AVATARS_SRC_LIST.indices).random()],
         lastMessage = newMessages[newMessages.size - 1],
         lastMessageTime = Tempo.now - (0..8).random().hour - (0..59).random().minute,
-        receivedUnreadMessagesCount = if (lastMessageSender == YOUR_MESSAGE) 0 else
-            unreadMessagesCountRandom
+        receivedUnreadMessagesCount = unreadMessagesCountRandom
     )
 }
 
@@ -93,19 +93,29 @@ fun createRandomChanges() {
 
     //выбор одного или двух случайных диалогов, от которых придет новое сообщение
     for (i in 0..(0..1).random()) {
-        val id = (CompanionUserDB.dialogsList.indices).random()
-        val newMessage = MessageData(
-            id = CompanionUserDB.messageLists[id].messages.size,
-            message = MESSAGE_STRING_LIST[(MESSAGE_STRING_LIST.indices).random()],
-            isRead = false,
-            isYour = false
-        )
-        CompanionUserDB.messageLists[id].messages.add(newMessage)
-
-        CompanionUserDB.dialogsList[id].lastMessage = newMessage
-        CompanionUserDB.dialogsList[id].lastMessageTime = Tempo.now
-        CompanionUserDB.dialogsList[id].receivedUnreadMessagesCount =
-            CompanionUserDB.dialogsList[id].receivedUnreadMessagesCount?.plus(1)
+        val index = (CompanionUserDB.dialogsList.indices).random()
+        val id = CompanionUserDB.dialogsList[index].id
+        for(messageList in CompanionUserDB.messageLists) {
+            if (messageList.id == id){
+                val newMessage = MessageData(
+                    id = messageList.messages.size,
+                    message = MESSAGE_STRING_LIST[(MESSAGE_STRING_LIST.indices).random()],
+                    isRead = false,
+                    isYour = false
+                )
+                messageList.messages.add(newMessage)
+                if(CompanionUserDB.dialogsList[index].lastMessage?.isYour == true){
+                    CompanionUserDB.dialogsList[index].receivedUnreadMessagesCount = 1
+                } else {
+                    CompanionUserDB.dialogsList[index].receivedUnreadMessagesCount =
+                        CompanionUserDB.dialogsList[index].receivedUnreadMessagesCount?.plus(1)
+                }
+                CompanionUserDB.dialogsList[index].lastMessage = newMessage
+                CompanionUserDB.dialogsList[index].lastMessageTime = Tempo.now
+            }
+        }
     }
 
 }
+
+

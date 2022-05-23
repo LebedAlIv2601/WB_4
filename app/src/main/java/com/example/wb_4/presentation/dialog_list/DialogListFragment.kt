@@ -105,10 +105,12 @@ class DialogListFragment : Fragment() {
 
 
     private fun navigateToChat(item: CompanionUserDomain){
+        Log.e("ID", item.id.toString())
         val navController = findNavController()
         val userInfoBundle = Bundle()
         userInfoBundle.putString("name", "${item.name}")
         userInfoBundle.putString("avatar", "${item.avatar}")
+        userInfoBundle.putInt("id", item.id)
         navController.navigate(R.id.action_dialogListFragment_to_chatFragment, userInfoBundle)
     }
 
