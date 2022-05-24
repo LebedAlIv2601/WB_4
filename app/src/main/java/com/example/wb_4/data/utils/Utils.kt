@@ -24,7 +24,7 @@ fun createRandomCompanionUserData(): CompanionUserData {
     //Рандомное число непрочитанных сообщений
     val unreadMessagesCountRandom = (0..12).random()
     //Рандомное количество сообщений
-    val messagesCount = (12..42).random()
+    val messagesCount = (22..42).random()
     //переменная для указания на автороство последнего сообщения - сам пользователь или собеседник
     val lastMessageSender = (NOT_YOUR_MESSAGE..YOUR_MESSAGE).random()
 

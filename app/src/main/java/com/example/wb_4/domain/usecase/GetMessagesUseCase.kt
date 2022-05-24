@@ -6,8 +6,8 @@ import javax.inject.Inject
 
 class GetMessagesUseCase @Inject constructor(private val repository: ChatRepository) {
 
-    suspend fun execute(userId: Int): List<MessageDomain>{
-        return repository.getChatMessages(userId)
+    suspend fun execute(userId: Int, lastId: Int): List<MessageDomain>{
+        return repository.getChatMessages(userId, lastId)
     }
 
 }

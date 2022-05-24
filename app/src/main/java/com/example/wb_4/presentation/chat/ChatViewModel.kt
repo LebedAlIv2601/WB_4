@@ -14,26 +14,45 @@ class ChatViewModel (private val getMessagesUseCase: GetMessagesUseCase) : ViewM
     val messagesList: LiveData<List<MessageDomain>>
         get() = _messagesList
 
+    private val _loadPermission = MutableLiveData<Boolean>()
+    val loadPermission: LiveData<Boolean>
+        get() = _loadPermission
+
+    private val _dataLastIndex = MutableLiveData<Int>()
+    val dataLastIndex: LiveData<Int>
+        get() = _dataLastIndex
+
     private var viewModelJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
-    fun getMessages(userId: Int){
+    init {
+        _loadPermission.value = true
+        _dataLastIndex.value = -1
+    }
+
+    fun getMessages(userId: Int, lastId: Int){
         ioScope.launch {
-            val newList = getMessagesUseCaseExecuting(userId)
+            val newList = getMessagesUseCaseExecuting(userId, lastId)
             if(newList.isNotEmpty()){
                 val prevList = _messagesList.value
                 val resultList = mutableListOf<MessageDomain>()
                 prevList?.let { resultList.addAll(it) }
                 resultList.addAll(newList)
                 _messagesList.value = resultList
+            } else {
+                _loadPermission.value = false
             }
         }
     }
 
-    private suspend fun getMessagesUseCaseExecuting(userId: Int): List<MessageDomain>{
+    private suspend fun getMessagesUseCaseExecuting(userId: Int, lastId: Int): List<MessageDomain>{
         return withContext(Dispatchers.IO){
-            getMessagesUseCase.execute(userId)
+            getMessagesUseCase.execute(userId, lastId)
         }
+    }
+
+    fun setupDataLastIndex(index: Int){
+        _dataLastIndex.value = index
     }
 
 }
