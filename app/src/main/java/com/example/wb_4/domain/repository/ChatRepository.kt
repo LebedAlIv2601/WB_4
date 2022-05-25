@@ -6,4 +6,6 @@ interface ChatRepository {
 
     suspend fun getChatMessages(userId: Int, lastId: Int): List<MessageDomain>
 
+    suspend fun updateChatMessages(userId: Int): List<MessageDomain>
+
 }

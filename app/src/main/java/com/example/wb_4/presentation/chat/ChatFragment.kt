@@ -81,13 +81,25 @@ class ChatFragment : Fragment() {
 
         setupObservers()
 
+        userId?.let { setupListeners(it) }
+
         userId?.let { vm.getMessages(it, dataLastIndex) }
 
+    }
+
+    private fun setupListeners(userId: Int) {
+        binding?.chatSwipeRefresh?.setOnRefreshListener {
+
+            binding?.chatSwipeRefresh?.isRefreshing = true
+
+            vm.updateMessages(userId)
+        }
     }
 
     private fun setupObservers() {
         vm.messagesList.observe(viewLifecycleOwner, Observer {
             adapter?.data = it
+            binding?.chatSwipeRefresh?.isRefreshing = false
         })
 
         vm.loadPermission.observe(viewLifecycleOwner, Observer {
@@ -111,32 +123,6 @@ class ChatFragment : Fragment() {
             chatRecyclerView.itemAnimator = null
 
             chatRecyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener(){
-
-//                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-//                    if(newState == RecyclerView.SCROLL_STATE_IDLE){
-//                        if(loadPermission) {
-//                            val layoutManager = binding?.chatRecyclerView?.layoutManager
-//                            if (layoutManager is LinearLayoutManager) {
-//
-//                                //Если индекс последнего видимого элемента равен индексу последнего
-//                                //элемента в списке в адаптере, и при этом до этого с этого места не были
-//                                //загружены данные, то загрузить новый данные
-//                                if (layoutManager.findFirstVisibleItemPosition() == 0 &&
-//                                    dataLastIndex != adapter?.data?.get(layoutManager.findFirstVisibleItemPosition())?.id
-//                                ) {
-//                                    Log.e("Scroll", "Need more data detected by scroll")
-//                                    adapter?.data?.get(layoutManager.findFirstVisibleItemPosition())?.id?.let {
-//                                        vm.setupDataLastIndex(
-//                                            it
-//                                        )
-//                                    }
-//                                    userId?.let { vm.getMessages(it, dataLastIndex) }
-//                                }
-//                            }
-//                        }
-//                    }
-//                    super.onScrollStateChanged(recyclerView, newState)
-//                }
 
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
 

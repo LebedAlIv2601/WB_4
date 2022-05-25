@@ -118,4 +118,33 @@ fun createRandomChanges() {
 
 }
 
+fun changeMessages(userId: Int){
+    for (messageList in CompanionUserDB.messageLists){
+        if(messageList.id == userId){
+            for (i in 0..(0..1).random()) {
+                messageList.messages[(messageList.messages.indices).random()].message =
+                    MESSAGE_STRING_LIST[(MESSAGE_STRING_LIST.indices).random()]
+            }
+
+            messageList.messages.add(
+                MessageData(
+                    id = messageList.messages[messageList.messages.size-1].id + 1,
+                    message = MESSAGE_STRING_LIST[(MESSAGE_STRING_LIST.indices).random()],
+                    isRead = true,
+                    isYour = false
+                )
+            )
+            for(dialog in CompanionUserDB.dialogsList){
+                if(dialog.id == userId){
+                    dialog.lastMessage = messageList.messages[messageList.messages.size-1]
+                    dialog.lastMessageTime = Tempo.now
+                    dialog.receivedUnreadMessagesCount = 0
+                }
+            }
+        }
+    }
+
+
+}
+
 

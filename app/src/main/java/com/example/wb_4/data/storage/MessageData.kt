@@ -2,7 +2,7 @@ package com.example.wb_4.data.storage
 
 data class MessageData(
     val id: Int,
-    val message: String,
+    var message: String,
     val isRead: Boolean,
     val isYour: Boolean
 )

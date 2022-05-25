@@ -1,12 +1,9 @@
 package com.example.wb_4.presentation.dialog_list
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
 import com.example.wb_4.domain.model.CompanionUserDomain
-import com.example.wb_4.presentation.utils.Resource
 import com.example.wb_4.domain.usecase.GetDialogListUseCase
 import com.example.wb_4.domain.usecase.UpdateDialogListUseCase
 import kotlinx.coroutines.*
@@ -30,7 +27,7 @@ class DialogListViewModel(
 
 
     private var viewModelJob = Job()
-    private val ioScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
     init {
         getDialogs(0)
@@ -39,7 +36,7 @@ class DialogListViewModel(
     }
 
     fun getDialogs(lastId: Int){
-        ioScope.launch {
+        uiScope.launch {
             val newList = getDialogsUseCaseExecuting(lastId)
             if(newList.isNotEmpty()){
                 val prevList = _dialogsList.value
@@ -60,7 +57,7 @@ class DialogListViewModel(
     }
 
     fun updateDialogs(){
-        ioScope.launch {
+        uiScope.launch {
             val newList = updateDialogsUseCaseExecuting()
             _dialogsList.value = newList
             _loadPermission.value = true
